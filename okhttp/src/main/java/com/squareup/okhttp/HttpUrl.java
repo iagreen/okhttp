@@ -261,7 +261,7 @@ public final class HttpUrl {
   static final String QUERY_ENCODE_SET = " \"'<>#";
   static final String QUERY_COMPONENT_ENCODE_SET = " \"'<>#&=";
   static final String CONVERT_TO_URI_ENCODE_SET = "^`{}|\\";
-  static final String FORM_ENCODE_SET = " \"':;<=>@[]^`{}|/\\?#&!$(),~";
+  static final String FORM_ENCODE_SET = " \"':;<=>@[]^`{}|/\\?#&!$(),~+";
   static final String FRAGMENT_ENCODE_SET = "";
 
   /** Either "http" or "https". */
@@ -1504,14 +1504,14 @@ public final class HttpUrl {
    * transformations:
    * <ul>
    *   <li>Tabs, newlines, form feeds and carriage returns are skipped.
-   *   <li>In queries, ' ' is encoded to '+' and '+' is encoded to "%2B".
+   *   <li>In queries, ' ' is encoded to '%20'
    *   <li>Characters in {@code encodeSet} are percent-encoded.
    *   <li>Control characters and non-ASCII characters are percent-encoded.
    *   <li>All other characters are copied without transformation.
    * </ul>
    *
    * @param alreadyEncoded true to leave '%' as-is; false to convert it to '%25'.
-   * @param query true if to encode ' ' as '+', and '+' as "%2B".
+   * @param query true if alreadyEncoded == true, re-encode '+' as '%20'
    */
   static String canonicalize(String input, int pos, int limit, String encodeSet,
       boolean alreadyEncoded, boolean query) {
@@ -1522,7 +1522,7 @@ public final class HttpUrl {
           || codePoint >= 0x7f
           || encodeSet.indexOf(codePoint) != -1
           || (codePoint == '%' && !alreadyEncoded)
-          || (query && codePoint == '+')) {
+          || (query && codePoint == '+' && alreadyEncoded)) {
         // Slow path: the character at i requires encoding!
         Buffer out = new Buffer();
         out.writeUtf8(input, pos, i);
@@ -1544,9 +1544,9 @@ public final class HttpUrl {
       if (alreadyEncoded
           && (codePoint == '\t' || codePoint == '\n' || codePoint == '\f' || codePoint == '\r')) {
         // Skip this character.
-      } else if (query && codePoint == '+') {
+      } else if (alreadyEncoded && query && codePoint == '+') {
         // HTML permits space to be encoded as '+'. We use '%20' to avoid special cases.
-        out.writeUtf8(alreadyEncoded ? "%20" : "%2B");
+        out.writeUtf8("%20");
       } else if (codePoint < 0x20
           || codePoint >= 0x7f
           || encodeSet.indexOf(codePoint) != -1

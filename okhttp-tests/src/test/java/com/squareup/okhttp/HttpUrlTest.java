@@ -991,7 +991,7 @@ public final class HttpUrlTest {
   @Test public void composeQueryWithComponents() throws Exception {
     HttpUrl base = HttpUrl.parse("http://host/");
     HttpUrl url = base.newBuilder().addQueryParameter("a+=& b", "c+=& d").build();
-    assertEquals("http://host/?a%2B%3D%26%20b=c%2B%3D%26%20d", url.toString());
+    assertEquals("http://host/?a+%3D%26%20b=c+%3D%26%20d", url.toString());
     assertEquals("c+=& d", url.queryParameterValue(0));
     assertEquals("a+=& b", url.queryParameterName(0));
     assertEquals("c+=& d", url.queryParameter("a+=& b"));
@@ -999,7 +999,7 @@ public final class HttpUrlTest {
     assertEquals(singletonList("c+=& d"), url.queryParameterValues("a+=& b"));
     assertEquals(1, url.querySize());
     assertEquals("a+=& b=c+=& d", url.query()); // Ambiguous! (Though working as designed.)
-    assertEquals("a%2B%3D%26%20b=c%2B%3D%26%20d", url.encodedQuery());
+    assertEquals("a+%3D%26%20b=c+%3D%26%20d", url.encodedQuery());
   }
 
   @Test public void composeQueryWithEncodedComponents() throws Exception {
@@ -1032,7 +1032,7 @@ public final class HttpUrlTest {
         .addQueryParameter("a+=& b", "c+=& d")
         .setQueryParameter("a+=& b", "ef")
         .build();
-    assertEquals("http://host/?a%2B%3D%26%20b=ef", url.toString());
+    assertEquals("http://host/?a+%3D%26%20b=ef", url.toString());
     assertEquals("ef", url.queryParameter("a+=& b"));
   }
 
@@ -1050,7 +1050,7 @@ public final class HttpUrlTest {
         .addQueryParameter("a+=& b", "c+=& d")
         .addQueryParameter("a+=& b", "e+=& f")
         .build();
-    assertEquals("http://host/?a%2B%3D%26%20b=c%2B%3D%26%20d&a%2B%3D%26%20b=e%2B%3D%26%20f",
+    assertEquals("http://host/?a+%3D%26%20b=c+%3D%26%20d&a+%3D%26%20b=e+%3D%26%20f",
         url.toString());
     assertEquals(2, url.querySize());
     assertEquals(Collections.singleton("a+=& b"), url.queryParameterNames());
